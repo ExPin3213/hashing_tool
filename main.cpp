@@ -2,6 +2,7 @@
 #include <getopt.h>
 
 using std::cout;
+using std::cerr;
 using std::endl;
 using std::string;
 
@@ -13,13 +14,13 @@ void help(char* arg0) {
 void opt_requirement(char opt) {
     switch (opt) {
         case 'c':
-            cout << "Option '-" << static_cast<char>(optopt) << "' requires <string> and <hash number> arguments" << endl;
+            cerr << "Option '-" << static_cast<char>(optopt) << "' requires <string> and <hash number> arguments" << endl;
             break;
         case 'g':
-            cout << "Option '-" << static_cast<char>(optopt) << "' requires <string> argument" << endl;
+            cerr << "Option '-" << static_cast<char>(optopt) << "' requires <string> argument" << endl;
             break;
         default:
-            cout << "Unknown option '-" << static_cast<char>(optopt) << "'" << endl;
+            cerr << "Unknown option '-" << static_cast<char>(optopt) << "'" << endl;
     }
 }
 
@@ -34,7 +35,7 @@ int main(int argc, char* argv[]) {
         string arg2, arg3;
 
         // Prevent segmentation fault
-        if (argc >= 3 && argc <=4) arg2 = argv[2];
+        if (argc >= 3 && argc <= 4) arg2 = argv[2];
         while ((opt = getopt(argc, argv, "c:g:")) != -1) {
             switch (opt) {
                 case 'c':
@@ -46,28 +47,33 @@ int main(int argc, char* argv[]) {
                         } else {
                             cout << "False" << endl;
                         }
+                    } else if (argc < 4) {
+                        cerr << "Error: <hash number> is required!" << endl;
                     } else {
-                        std::cerr << "Error: <hash number> is required" << endl;
-                        return -1;
+                        cerr << "Error: too many arguments!" << endl;
                     }
                     break;
                 case 'g':
-                    // Generate a hash number
-                    cout << "String: " << arg2 << "\n" << "Hash: " << hashObj(arg2) << endl;
+                    if (argc == 3) {
+                        // Generate a hash number
+                        cout << "String: " << arg2 << "\n" << "Hash: " << hashObj(arg2) << endl;
+                    } else if (argc < 3) {
+                        cerr << "Error: <hash number> is required!" << endl;
+                    } else {
+                        cerr << "Error: too many arguments!" << endl;
+                    }
                     break;
                 case '?':
                     opt_requirement(optopt);
                     help(argv[0]);
                     break;
                 default:
-                    std::cerr << "Unknown error!" << endl;
-                    return -2;
+                    cerr << "Unknown error!" << endl;
             }
         }
     } else {
-        std::cerr << "Error: no arguments!" << endl;
+        cerr << "Error: no arguments!" << endl;
         help(argv[0]);
-        return -1;
     }
 
     return 0;
